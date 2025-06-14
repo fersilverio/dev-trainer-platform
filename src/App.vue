@@ -1,7 +1,9 @@
 <script setup>
 import Card from './components/Card.vue';
+import KanbanColumnBody from './components/KanbanColumnBody.vue';
 import { Container, Draggable } from "vue-dndrop";
 import { ref } from 'vue';
+import KanbanColumnTitle from './components/KanbanColumnTitle.vue';
 
 
 // 1. Gerenciar o estado dos cards para cada coluna
@@ -27,6 +29,7 @@ const column2Cards = ref([]);
 const column3Cards = ref([]);
 const column4Cards = ref([]);
 const column5Cards = ref([]);
+const column6Cards = ref([]);
 
 
 /**
@@ -58,6 +61,7 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
     case 'col3': currentColumnArrayRef = column3Cards; break;
     case 'col4': currentColumnArrayRef = column4Cards; break;
     case 'col5': currentColumnArrayRef = column5Cards; break;
+    case 'col6': currentColumnArrayRef = column6Cards; break;
     default: return;
   }
 
@@ -82,15 +86,6 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
   currentColumnArrayRef.value = newItemsInColumn;
 };
 
-// Funções para obter o payload do item arrastável para cada coluna
-// O `payload` é o dado que é "carregado" com o Draggable quando ele é arrastado
-// para outro container.
-const getColumn1Payload = (index) => column1Cards.value[index];
-const getColumn2Payload = (index) => column2Cards.value[index];
-const getColumn3Payload = (index) => column3Cards.value[index];
-const getColumn4Payload = (index) => column4Cards.value[index];
-const getColumn5Payload = (index) => column5Cards.value[index];
-
 
 </script>
 
@@ -102,68 +97,31 @@ const getColumn5Payload = (index) => column5Cards.value[index];
 
       <h1 class="text-black text-3xl font-bold mb-4 text-center">Painel de Cards Arrasta e Solta</h1>
 
-      <div class="flex gap-5">
-
-        <div class="flex-1 bg-blue-200 rounded-md h-[800px]">
-          <Container group-name="colunas" :get-child-payload="getColumn1Payload"
-            @drop="(e) => handleColumnDrop('col1', e)"
-            class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-blue-800 font-semibold">
-            <Draggable v-for="card in column1Cards" :key="card.id" class="flex-shrink-0">
-              <Card :text="card.text" />
-            </Draggable>
-            <span v-if="column1Cards.length === 0" class="text-gray-500 text-sm text-center italic mt-4 w-full">Arraste
-              cards para cá</span>
-          </Container>
+      <div class="flex gap-5 overflow-x-scroll">
+        <div>
+          <KanbanColumnTitle :stepName="'Backlog'" />
+          <KanbanColumnBody column-id="col1" :columnCards="column1Cards" @drop-column="handleColumnDrop" />
         </div>
-
-        <div class="flex-1 bg-green-200 rounded-md h-[800px]">
-          <Container group-name="colunas" :get-child-payload="getColumn2Payload"
-            @drop="(e) => handleColumnDrop('col2', e)"
-            class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-green-800 font-semibold">
-            <Draggable v-for="card in column2Cards" :key="card.id" class="flex-shrink-0">
-              <Card :text="card.text" />
-            </Draggable>
-            <span v-if="column2Cards.length === 0" class="text-gray-500 text-sm text-center italic mt-4">Arraste cards
-              para cá</span>
-          </Container>
+        <div>
+          <KanbanColumnTitle :stepName="'Doing'" />
+          <KanbanColumnBody column-id="col2" :columnCards="column2Cards" @drop-column="handleColumnDrop" />
         </div>
-
-        <div class="flex-1 bg-red-200 rounded-md h-[800px]">
-          <Container group-name="colunas" :get-child-payload="getColumn3Payload"
-            @drop="(e) => handleColumnDrop('col3', e)"
-            class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-red-800 font-semibold">
-            <Draggable v-for="card in column3Cards" :key="card.id" class="flex-shrink-0">
-              <Card :text="card.text" />
-            </Draggable>
-            <span v-if="column3Cards.length === 0" class="text-gray-500 text-sm text-center italic mt-4">Arraste cards
-              para cá</span>
-          </Container>
+        <div>
+          <KanbanColumnTitle :stepName="'Review'" />
+          <KanbanColumnBody column-id="col3" :columnCards="column3Cards" @drop-column="handleColumnDrop" />
         </div>
-
-        <div class="flex-1 bg-purple-200 rounded-md h-[800px]">
-          <Container group-name="colunas" :get-child-payload="getColumn4Payload"
-            @drop="(e) => handleColumnDrop('col4', e)"
-            class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-purple-800 font-semibold">
-            <Draggable v-for="card in column4Cards" :key="card.id" class="flex-shrink-0">
-              <Card :text="card.text" />
-            </Draggable>
-            <span v-if="column4Cards.length === 0" class="text-gray-500 text-sm text-center italic mt-4">Arraste cards
-              para cá</span>
-          </Container>
+        <div>
+          <KanbanColumnTitle :stepName="'For test'" />
+          <KanbanColumnBody column-id="col4" :columnCards="column4Cards" @drop-column="handleColumnDrop" />
         </div>
-
-        <div class="flex-1 bg-green-200 rounded-md h-[800px]">
-          <Container group-name="colunas" :get-child-payload="getColumn5Payload"
-            @drop="(e) => handleColumnDrop('col5', e)"
-            class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-green-800 font-semibold">
-            <Draggable v-for="card in column5Cards" :key="card.id" class="flex-shrink-0">
-              <Card :text="card.text" />
-            </Draggable>
-            <span v-if="column5Cards.length === 0" class="text-gray-500 text-sm text-center italic mt-4">Arraste cards
-              para cá</span>
-          </Container>
+        <div>
+          <KanbanColumnTitle :stepName="'Testing'" />
+          <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
         </div>
-
+        <div>
+          <KanbanColumnTitle :stepName="'For Deploy'" />
+          <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
+        </div>
       </div>
 
     </div>
