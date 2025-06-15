@@ -16,18 +16,18 @@ const props = defineProps({
         type: String,
         required: true,
     },
-    cardCategoryName: {
-        type: String,
-        required: true,
-    },
-    cardOwner: {
-        type: String,
-        required: true,
-    },
-    cardOwnerPicture: {
-        type: String,
-        required: false,
-    }
+    // cardCategoryName: {
+    //     type: String,
+    //     required: true,
+    // },
+    // cardOwner: {
+    //     type: String,
+    //     required: true,
+    // },
+    // cardOwnerPicture: {
+    //     type: String,
+    //     required: false,
+    // }
 });
 
 

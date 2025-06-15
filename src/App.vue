@@ -33,6 +33,11 @@ const column4Cards = ref([]);
 const column5Cards = ref([]);
 const column6Cards = ref([]);
 
+const kanbanColumns = ref([column1Cards, column2Cards, column3Cards, column4Cards, column5Cards, column6Cards]);
+
+console.log(kanbanColumns.value.length)
+console.log(kanbanColumns.value[0].value)
+
 
 /**
  * Função principal para lidar com o evento de drop em qualquer coluna.

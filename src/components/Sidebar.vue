@@ -1,5 +1,6 @@
 <template>
     <aside class="sidebar justify-start">
+
         <section class="sidebar-title items-center p-4">
             <svg fill="none" height="42" viewBox="0 0 32 32" width="42" xmlns="http://www.w3.org/2000/svg">
                 <rect height="100%" rx="16" width="100%"></rect>
@@ -10,6 +11,32 @@
             <div class="flex flex-col">
                 <span>Acme</span>
                 <span class="text-xs font-normal text-content2">Team Plan</span>
+            </div>
+        </section>
+        <section class="bg-gray-2 pt-2">
+            <div class="divider my-0"></div>
+            <div class="dropdown z-50 flex h-fit w-full cursor-pointer hover:bg-gray-4">
+                <label class="whites mx-2 flex h-fit w-full cursor-pointer p-0 hover:bg-gray-4" tabindex="0">
+                    <div class="flex flex-row gap-4 p-4">
+                        <div class="avatar avatar-md">
+                            <img src="https://i.pravatar.cc/150?img=30" alt="avatar" />
+                        </div>
+
+                        <div class="flex flex-col">
+                            <span>Sandra Marx</span>
+                            <span class="text-xs font-normal text-content2">sandra</span>
+                        </div>
+                    </div>
+                </label>
+                <div class="dropdown-menu ml-2">
+                    <a class="dropdown-item text-sm">Profile</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Account settings</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Change email</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Subscriptions</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Change password</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Refer a friend</a>
+                    <a tabindex="-1" class="dropdown-item text-sm">Settings</a>
+                </div>
             </div>
         </section>
         <section class="sidebar-content h-fit min-h-[20rem] overflow-visible">
@@ -80,32 +107,7 @@
                 </section>
             </nav>
         </section>
-        <section class="sidebar-footer h-full justify-end bg-gray-2 pt-2">
-            <div class="divider my-0"></div>
-            <div class="dropdown z-50 flex h-fit w-full cursor-pointer hover:bg-gray-4">
-                <label class="whites mx-2 flex h-fit w-full cursor-pointer p-0 hover:bg-gray-4" tabindex="0">
-                    <div class="flex flex-row gap-4 p-4">
-                        <div class="avatar avatar-md">
-                            <img src="https://i.pravatar.cc/150?img=30" alt="avatar" />
-                        </div>
 
-                        <div class="flex flex-col">
-                            <span>Sandra Marx</span>
-                            <span class="text-xs font-normal text-content2">sandra</span>
-                        </div>
-                    </div>
-                </label>
-                <div class="dropdown-menu dropdown-menu-right-top ml-2">
-                    <a class="dropdown-item text-sm">Profile</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Account settings</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Change email</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Subscriptions</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Change password</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Refer a friend</a>
-                    <a tabindex="-1" class="dropdown-item text-sm">Settings</a>
-                </div>
-            </div>
-        </section>
     </aside>
 </template>
 <script setup></script>
