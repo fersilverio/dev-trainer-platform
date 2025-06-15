@@ -3,7 +3,7 @@
         <Container group-name="colunas" :get-child-payload="getChildPayload" @drop="onDrop"
             class="p-4 gap-2 flex flex-col h-full overflow-y-scroll text-blue-800 font-semibold">
             <Draggable v-for="card in columnCards" :key="card.id" class="flex-shrink-0">
-                <Card :text="card.text" />
+                <Card :cardTitle="card.text" />
             </Draggable>
             <span v-if="columnCards.length === 0" class="text-black text-sm text-center italic mt-4 w-full">Arraste
                 cards para cá</span>

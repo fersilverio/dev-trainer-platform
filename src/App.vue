@@ -4,6 +4,8 @@ import KanbanColumnBody from './components/KanbanColumnBody.vue';
 import { Container, Draggable } from "vue-dndrop";
 import { ref } from 'vue';
 import KanbanColumnTitle from './components/KanbanColumnTitle.vue';
+import Navbar from './components/Navbar.vue';
+import Sidebar from './components/Sidebar.vue';
 
 
 // 1. Gerenciar o estado dos cards para cada coluna
@@ -11,8 +13,8 @@ import KanbanColumnTitle from './components/KanbanColumnTitle.vue';
 // É crucial que cada card tenha um 'id' único para que Vue e vue-dndrop
 // possam rastreá-los corretamente (usando :key).
 const column1Cards = ref([
-  { id: 'c1-1', text: 'Card 1 (Coluna 1)' },
-  { id: 'c1-2', text: 'Card 2 (Coluna 1)' },
+  { id: 'c1-1', text: '[TAREFAS] Criar tabela para tarefas' },
+  { id: 'c1-2', text: '[TAREFAS] Construir kanban para tarefas' },
   { id: 'c1-3', text: 'Card 3 (Coluna 1)' },
   { id: 'c1-4', text: 'Card 4 (Coluna 1)' },
   { id: 'c1-5', text: 'Card 5 (Coluna 1)' },
@@ -91,41 +93,40 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
 
 
 <template>
-  <div class="bg-gray-100 flex items-center justify-center min-h-screen">
-
-    <div class="w-full md:w-3/4 lg:w-2/3 xl:w-full bg-white p-6 rounded-lg shadow-lg flex flex-col min-h-screen">
-
-      <h1 class="text-black text-3xl font-bold mb-4 text-center">Painel de Cards Arrasta e Solta</h1>
-
-      <div class="flex gap-5 overflow-x-scroll">
-        <div>
-          <KanbanColumnTitle :stepName="'Backlog'" />
-          <KanbanColumnBody column-id="col1" :columnCards="column1Cards" @drop-column="handleColumnDrop" />
-        </div>
-        <div>
-          <KanbanColumnTitle :stepName="'Doing'" />
-          <KanbanColumnBody column-id="col2" :columnCards="column2Cards" @drop-column="handleColumnDrop" />
-        </div>
-        <div>
-          <KanbanColumnTitle :stepName="'Review'" />
-          <KanbanColumnBody column-id="col3" :columnCards="column3Cards" @drop-column="handleColumnDrop" />
-        </div>
-        <div>
-          <KanbanColumnTitle :stepName="'For test'" />
-          <KanbanColumnBody column-id="col4" :columnCards="column4Cards" @drop-column="handleColumnDrop" />
-        </div>
-        <div>
-          <KanbanColumnTitle :stepName="'Testing'" />
-          <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
-        </div>
-        <div>
-          <KanbanColumnTitle :stepName="'For Deploy'" />
-          <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
+  <Navbar />
+  <div class="flex flex-1 justify-start">
+    <Sidebar />
+    <div class="bg-gray-100 flex items-center justify-center min-h-screen overflow-x-scroll">
+      <div class="w-full md:w-3/4 lg:w-2/3 xl:w-full bg-white p-6 rounded-lg shadow-lg flex flex-col min-h-screen">
+        <h1 class="text-black text-3xl font-bold mb-4 text-start">Progresso de tarefas</h1>
+        <div class="flex gap-5">
+          <div>
+            <KanbanColumnTitle :stepName="'Backlog'" />
+            <KanbanColumnBody column-id="col1" :columnCards="column1Cards" @drop-column="handleColumnDrop" />
+          </div>
+          <div>
+            <KanbanColumnTitle :stepName="'Doing'" />
+            <KanbanColumnBody column-id="col2" :columnCards="column2Cards" @drop-column="handleColumnDrop" />
+          </div>
+          <div>
+            <KanbanColumnTitle :stepName="'Review'" />
+            <KanbanColumnBody column-id="col3" :columnCards="column3Cards" @drop-column="handleColumnDrop" />
+          </div>
+          <div>
+            <KanbanColumnTitle :stepName="'For test'" />
+            <KanbanColumnBody column-id="col4" :columnCards="column4Cards" @drop-column="handleColumnDrop" />
+          </div>
+          <div>
+            <KanbanColumnTitle :stepName="'Testing'" />
+            <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
+          </div>
+          <div>
+            <KanbanColumnTitle :stepName="'For Deploy'" />
+            <KanbanColumnBody column-id="col5" :columnCards="column5Cards" @drop-column="handleColumnDrop" />
+          </div>
         </div>
       </div>
-
     </div>
-
   </div>
 </template>
 
