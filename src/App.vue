@@ -1,4 +1,4 @@
-<script setup>
+<!-- <script setup>
 import Card from './components/Card.vue';
 import KanbanColumnBody from './components/KanbanColumnBody.vue';
 import { Container, Draggable } from "vue-dndrop";
@@ -94,14 +94,14 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
 };
 
 
-</script>
+</script> -->
 
 
-<template>
+<!-- <template>
   <Navbar />
   <div class="flex flex-1 justify-start">
     <Sidebar />
-    <div class="bg-gray-100 flex items-center justify-center min-h-screen overflow-x-scroll">
+    <!-- <div class="bg-gray-100 flex items-center justify-center min-h-screen overflow-x-scroll">
       <div class="w-full md:w-3/4 lg:w-2/3 xl:w-full bg-white p-6 rounded-lg shadow-lg flex flex-col min-h-screen">
         <h1 class="text-black text-3xl font-bold mb-4 text-start">Progresso de tarefas</h1>
         <div class="flex gap-5">
@@ -132,12 +132,12 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
         </div>
       </div>
     </div>
-  </div>
-</template>
+</div>
+</template> -->
 
 
 
-<style scoped>
+<!-- <style scoped>
 /* Estilos para o feedback visual do arrasto */
 .smooth-dnd-ghost {
   opacity: 0.5;
@@ -150,4 +150,26 @@ const handleColumnDrop = (currentColumnId, dropResult) => {
   transition: transform 0.3s ease-in-out;
   /* Transição suave para o movimento */
 }
+</style> -->
+
+
+
+<script setup>
+import Navbar from './components/Navbar.vue';
+import Sidebar from './components/Sidebar.vue';
+import { RouterView } from 'vue-router';
+</script>
+
+<template>
+  <Navbar />
+  <div class="flex">
+    <Sidebar />
+    <div class="flex-1">
+      <RouterView />
+    </div>
+  </div>
+</template>
+
+<style scoped>
+/* You can add global styles here if needed */
 </style>

@@ -2308,6 +2308,10 @@ html {
   margin-top: 1rem;
 }
 
+.mr-4 {
+  margin-right: 1rem;
+}
+
 .flex {
   display: flex;
 }
@@ -2359,6 +2363,30 @@ html {
 
 .w-full {
   width: 100%;
+}
+
+.w-\[700px\] {
+  width: 700px;
+}
+
+.w-2\/3 {
+  width: 66.666667%;
+}
+
+.w-3\/4 {
+  width: 75%;
+}
+
+.w-\[1200px\] {
+  width: 1200px;
+}
+
+.w-\[1700px\] {
+  width: 1700px;
+}
+
+.w-\[1750px\] {
+  width: 1750px;
 }
 
 .flex-1 {
@@ -2486,6 +2514,14 @@ html {
 
 .p-6 {
   padding: 1.5rem;
+}
+
+.p-7 {
+  padding: 1.75rem;
+}
+
+.p-8 {
+  padding: 2rem;
 }
 
 .px-0 {
