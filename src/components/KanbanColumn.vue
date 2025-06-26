@@ -1,7 +1,7 @@
 <template>
     <div
         class="kanban-column flex flex-col bg-gray-100 border border-gray-300 rounded-lg shadow-md w-[300px] flex-shrink-0">
-        <div class="kanban-column-header bg-blue-600 text-white p-3 rounded-t-lg font-bold text-lg text-center">
+        <div class="kanban-column-header bg-gray-950 text-white p-3 rounded-t-lg font-bold text-lg text-center">
             {{ title }}
         </div>
 
@@ -18,12 +18,12 @@
             </template>
         </draggable>
 
-        <div class="p-3 border-t border-gray-300">
+        <!-- <div class="p-3 border-t border-gray-300">
             <button @click="addNewCard"
                 class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                 + Adicionar Card
             </button>
-        </div>
+        </div> -->
     </div>
 </template>
 
@@ -110,7 +110,7 @@ const addNewCard = () => {
 
 <style scoped>
 .kanban-column {
-    height: 700px;
+    height: 800px;
     /* Altura fixa para as colunas */
 }
 

@@ -1,6 +1,6 @@
 <template>
     <div class="kanban-board-container flex flex-grow p-6 bg-gray-50 min-h-screen overflow-hidden">
-        <div class="bg-blue-200 flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
+        <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
             <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
                 :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved"
                 @add-card="handleAddCard" class="mr-4 last:mr-0" />
