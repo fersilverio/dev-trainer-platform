@@ -162,7 +162,7 @@ import { RouterView } from 'vue-router';
 
 <template>
   <Navbar />
-  <div class="flex">
+  <div class="flex overflow-x-hidden">
     <Sidebar />
     <div class="flex-1">
       <RouterView />

@@ -1,98 +1,170 @@
 <template>
-    <div class="bg-gray-100 flex items-center justify-center min-h-screen overflow-x-scroll w-[1750px]">
-        <div
-            class="w-full md:w-3/4 lg:w-2/3 xl:w-full bg-white p-8 mr-4 rounded-lg shadow-lg flex flex-col min-h-screen">
-            <h1 class="text-black text-3xl font-bold mb-4 text-start">Progresso de tarefas</h1>
-            <div class="flex gap-5">
-                <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :title="column.title"
-                    :columnId="column.id" :cards="column.cards" @drop-column="handleColumnDrop" />
-            </div>
+    <div class="kanban-board-container flex flex-grow p-6 bg-gray-50 min-h-screen overflow-hidden">
+        <div class="bg-blue-200 flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
+            <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
+                :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved"
+                @add-card="handleAddCard" class="mr-4 last:mr-0" />
         </div>
     </div>
 </template>
+
 <script setup>
-import KanbanColumn from '../components/KanbanColumn.vue'
-import { Container, Draggable } from "vue-dndrop";
-import { ref } from 'vue';
+import { ref, onMounted, watch } from 'vue'; // Adicione onMounted e watch para depuração
+import KanbanColumn from '../components/KanbanColumn.vue';
 
-
-// 1. Gerenciar o estado dos cards para cada coluna
-// Cada ref será uma lista de objetos, representando os cards em cada coluna.
-// É crucial que cada card tenha um 'id' único para que Vue e vue-dndrop
-// possam rastreá-los corretamente (usando :key).
+// --- SEÇÃO DE DADOS: VERIFIQUE ESTA PARTE COM CUIDADO ---
 const columnDefinitions = ref([
     {
-        id: 'col1', title: 'Backlog', cards: ref([
-            { id: 'c1-1', text: '[TAREFAS] Criar tabela para tarefas' },
-            { id: 'c1-2', text: '[TAREFAS] Construir kanban para tarefas' },
-            { id: 'c1-3', text: 'Card 3 (Coluna 1)' },
-            { id: 'c1-4', text: 'Card 4 (Coluna 1)' },
-            { id: 'c1-5', text: 'Card 5 (Coluna 1)' },
-            { id: 'c1-6', text: 'Card 6 (Coluna 1)' },
-            { id: 'c1-7', text: 'Card 7 (Coluna 1)' },
-            { id: 'c1-8', text: 'Card 8 (Coluna 1)' },
-            { id: 'c1-9', text: 'Card 9 (Coluna 1)' },
-            { id: 'c1-10', text: 'Card 10 (Coluna 1)' },
-            { id: 'c1-11', text: 'Card 11 (Coluna 1)' },
-            { id: 'c1-12', text: 'Card 12 (Coluna 1)' },
+        id: 'in-analysis',
+        title: '✍️ Em analise',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '15', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
         ])
     },
-    { id: 'col2', title: 'Doing', cards: ref([]) },
-    { id: 'col3', title: 'Review', cards: ref([]) },
-    { id: 'col4', title: 'For test', cards: ref([]) },
-    { id: 'col5', title: 'Testing', cards: ref([]) },
-    { id: 'col6', title: 'For Deploy', cards: ref([]) },
+    {
+        id: 'in-analysis',
+        title: '✍️ Em analise',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        ])
+    },
+    {
+        id: 'in-analysis',
+        title: '✍️ Em analise',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '11', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '12', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        ])
+    },
+    {
+        id: 'in-analysis',
+        title: '✍️ Em analise',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '9', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '10', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        ])
+    },
+    {
+        id: 'in-analysis',
+        title: '✍️ Em analise',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '7', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '8', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        ])
+    },
+    {
+        id: 'todo',
+        title: '✍️ A Fazer',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '1', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            { id: '2', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        ])
+    },
+    {
+        id: 'in-progress',
+        title: '🚀 Em Andamento',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '3', title: 'Codificar módulo de autenticação', description: 'Implementar login e registro de usuários.' },
+        ])
+    },
+    {
+        id: 'review',
+        title: '🧐 Em Revisão',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '4', title: 'Revisar código do backend', description: 'Verificar boas práticas e bugs.' },
+        ])
+    },
+    {
+        id: 'done',
+        title: '✅ Concluído',
+        cards: ref([ // <<< MANTENHA O ref([]) AQUI
+            { id: '5', title: 'Deploy para produção', description: 'Finalizar lançamento da versão 1.0.' },
+            { id: '6', title: 'Deploy para produção 2', description: 'Finalizar lançamento da versão 1.0 agora é real.' },
+        ])
+    },
 ]);
 
-// const column2Cards = ref([]);
-// const column3Cards = ref([]);
-// const column4Cards = ref([]);
-// const column5Cards = ref([]);
-// const column6Cards = ref([]);
+// --- DEBGUING: ADICIONE ESTES LOGS ---
+onMounted(() => {
+    console.log("KanbanView: columnDefinitions no onMounted:", JSON.parse(JSON.stringify(columnDefinitions.value)));
+    // Verifique a estrutura de uma coluna específica:
+    console.log("KanbanView: Exemplo de coluna 'todo'.cards:", columnDefinitions.value[0].cards);
+    console.log("KanbanView: Exemplo de coluna 'todo'.cards.value:", columnDefinitions.value[0].cards.value);
+});
 
-// const kanbanColumns = ref([column1Cards, column2Cards, column3Cards, column4Cards, column5Cards, column6Cards]);
+// Acompanhe mudanças em columnDefinitions
+watch(columnDefinitions, (newVal) => {
+    console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
+    // Após a mudança, verifique a estrutura de uma coluna novamente
+    if (newVal.length > 0) {
+        console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
+        if (newVal[0].cards) {
+            console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
+        }
+    }
+}, { deep: true }); // Observe profundamente para pegar mutações internas
 
-// console.log(kanbanColumns.value.length)
-// console.log(kanbanColumns.value[0].value)
+// --- FIM DA SEÇÃO DE DEBUGGING ---
 
 
-/**
- * Função principal para lidar com o evento de drop em qualquer coluna.
- * Ela é responsável por atualizar o estado da coluna de destino e
- * o estado da coluna de origem (se o item foi movido entre colunas).
- *
- * @param {string} columnId O ID da coluna onde o drop ocorreu (ex: 'col1', 'col2').
- * @param {object} dropResult O objeto de resultado fornecido por vue-dndrop.
- */
-const handleColumnDrop = (currentColumnId, dropResult) => {
-    const currentColumnDef = columnDefinitions.value.find(col => col.id === currentColumnId);
-    if (!currentColumnDef) return;
-    const currentColumnArrayRef = currentColumnDef.cards; // <---- A correção está aqui
+const handleCardMoved = (event) => {
+    // ... (sua lógica existente para handleCardMoved permanece a mesma) ...
+    // Se o problema não for na adição, esta parte deve estar funcionando.
+    if (event.type === 'added') {
+        columnDefinitions.value.forEach(col => {
+            if (col.id !== event.targetColumnId) {
+                const cardIndex = col.cards.findIndex(c => c.id === event.card.id);
+                if (cardIndex !== -1) {
+                    col.cards.splice(cardIndex, 1);
+                }
+            }
+        });
+    }
+    // ...
+};
 
-    const {
-        addedIndex: addedIndexInCurrentColumn,
-        removedIndex: removedIndexInCurrentColumn,
-        payload: movedCard,
-        isCanceled
-    } = dropResult;
+const handleAddCard = ({ columnId, card }) => {
+    debugger;
 
-    if (isCanceled) {
+    console.log(`handleAddCard acionado para coluna ID: ${columnId}`);
+    console.log("Card a ser adicionado:", card);
+
+    const targetColumn = columnDefinitions.value.find(col => col.id === columnId);
+
+    // --- VERIFICAÇÕES DE ROBUSTEZ MAIS FORTES ---
+    if (!targetColumn) {
+        console.error(`ERRO CRÍTICO: Coluna com ID "${columnId}" não encontrada em columnDefinitions.`);
+        return; // Sai da função se a coluna não for encontrada
+    }
+
+    if (!targetColumn.cards) {
+        console.error(`ERRO CRÍTICO: A propriedade 'cards' está faltando no objeto da coluna ${columnId}.`);
+        console.log("Objeto da coluna encontrado:", JSON.parse(JSON.stringify(targetColumn)));
         return;
     }
 
-    let newItemsInColumn = [...currentColumnArrayRef.value];
+    // AQUI É O PONTO CRÍTICO: targetColumn.cards DEVE SER UM REF
+    // if (!targetColumn.cards.value) {
+    //     console.error(`ERRO CRÍTICO: 'targetColumn.cards' não é um ref ou seu .value é undefined para a coluna ${columnId}.`);
+    //     console.log("Valor de targetColumn.cards:", targetColumn.cards); // Isso deve ser um RefImpl
+    //     return;
+    // }
+    // --- FIM DAS VERIFICAÇÕES ---
 
-    if (removedIndexInCurrentColumn !== null && addedIndexInCurrentColumn !== null) {
-        const [reorderedItem] = newItemsInColumn.splice(removedIndexInCurrentColumn, 1);
-        newItemsInColumn.splice(addedIndexInCurrentColumn, 0, reorderedItem);
-    } else if (addedIndexInCurrentColumn !== null && removedIndexInCurrentColumn === null && movedCard) {
-        newItemsInColumn.splice(addedIndexInCurrentColumn, 0, movedCard);
-    } else if (removedIndexInCurrentColumn !== null && addedIndexInCurrentColumn === null) {
-        newItemsInColumn.splice(removedIndexInCurrentColumn, 1);
-    }
-
-    currentColumnArrayRef.value = newItemsInColumn;
+    // Se passarmos por todas as verificações, podemos adicionar o card com segurança.
+    targetColumn.cards.push(card);
+    console.log(`SUCESSO: Novo card "${card.title}" adicionado à coluna "${columnId}".`);
+    console.log(`Estado atualizado da coluna ${columnId}:`, JSON.parse(JSON.stringify(targetColumn.cards.value)));
 };
-
-
 </script>
+
+<style scoped>
+.kanban-board-container {
+    display: flex;
+    gap: 1.5rem;
+    min-height: 100vh;
+    align-items: flex-start;
+}
+</style>
