@@ -18,7 +18,14 @@ const columnDefinitions = ref([
         id: 'in-analysis',
         title: '✍️ Em analise',
         cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '15', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+            {
+                id: '15',
+                title: 'Comprar materiais de escritório',
+                description: 'Canetas, papel, clips.',
+                userResponsible: "Fernando Silva",
+                priority: "HIGH",
+                deadline: "2025/10/10"
+            },
             { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
         ])
     },
@@ -126,7 +133,6 @@ const handleCardMoved = (event) => {
 };
 
 const handleAddCard = ({ columnId, card }) => {
-    debugger;
 
     console.log(`handleAddCard acionado para coluna ID: ${columnId}`);
     console.log("Card a ser adicionado:", card);
