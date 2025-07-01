@@ -20,10 +20,10 @@ const columnDefinitions = ref([
         cards: ref([ // <<< MANTENHA O ref([]) AQUI
             {
                 id: '15',
-                title: 'Comprar materiais de escritório',
-                description: 'Canetas, papel, clips.',
-                userResponsible: "Fernando Silva",
-                priority: "HIGH",
+                title: 'Criar tabelas de usuário para autenticação',
+                description: 'Implementação inicial do sistema',
+                userResponsible: "Fernando Silva Silvério",
+                priority: 1,
                 deadline: "2025/10/10"
             },
             { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
@@ -33,8 +33,15 @@ const columnDefinitions = ref([
         id: 'in-analysis',
         title: '✍️ Em analise',
         cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-            { id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+            {
+                id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.', userResponsible: "Jorge Valdivia",
+                priority: 2,
+                deadline: "2025/10/10"
+            },
+            {
+                id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.', userResponsible: "Arjen Robben", priority: 3,
+                deadline: "2025/10/10"
+            },
         ])
     },
     {
