@@ -14,6 +14,11 @@ const router = createRouter({
             path: '/kanban',
             name: 'kanban',
             component: KanbanView,
+        },
+        {
+            path: '/projects',
+            name: 'projects',
+            component: () => import('../views/ProjectsView.vue'),
         }
 
     ],
