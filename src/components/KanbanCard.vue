@@ -1,7 +1,7 @@
 <template>
     <div class="kanban-card bg-white border-l-4 border-l-blue-200 rounded-md p-3 mb-2 shadow-sm cursor-grab">
         <div class="flex flex-col h-full justify-between overflow-x-hidden">
-            <div v-if="card.description" class="text-sm text-gray-600 mt-1">{{
+            <div v-if="card.description" class="text-sm text-gray-600 mt-1 truncate">{{
                 card.description }}
             </div>
             <span class="tooltip tooltip-right" :data-tooltip="card.title">

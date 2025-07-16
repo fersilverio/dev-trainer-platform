@@ -11,101 +11,126 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'; // Adicione onMounted e watch para depuração
 import KanbanColumn from '../components/KanbanColumn.vue';
+import { api } from '../services/api';
 
 // --- SEÇÃO DE DADOS: VERIFIQUE ESTA PARTE COM CUIDADO ---
 const columnDefinitions = ref([
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            {
-                id: '15',
-                title: 'Criar tabelas de usuário para autenticação',
-                description: 'Implementação inicial do sistema',
-                userResponsible: "Fernando Silva Silvério",
-                priority: 1,
-                deadline: "2025/10/10"
-            },
-            { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     {
+        //         id: '15',
+        //         title: 'Criar tabelas de usuário para autenticação',
+        //         description: 'Implementação inicial do sistema',
+        //         userResponsible: "Fernando Silva Silvério",
+        //         priority: 1,
+        //         deadline: "2025/10/10"
+        //     },
+        //     { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        // ])
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            {
-                id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.', userResponsible: "Jorge Valdivia",
-                priority: 2,
-                deadline: "2025/10/10"
-            },
-            {
-                id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.', userResponsible: "Arjen Robben", priority: 3,
-                deadline: "2025/10/10"
-            },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     {
+        //         id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.', userResponsible: "Jorge Valdivia",
+        //         priority: 2,
+        //         deadline: "2025/10/10"
+        //     },
+        //     {
+        //         id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.', userResponsible: "Arjen Robben", priority: 3,
+        //         deadline: "2025/10/10"
+        //     },
+        // ])
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '11', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-            { id: '12', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '11', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+        //     { id: '12', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        // ])
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '9', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-            { id: '10', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '9', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+        //     { id: '10', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        // ])
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '7', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-            { id: '8', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '7', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+        //     { id: '8', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        // ])
     },
     {
         id: 'todo',
         title: '✍️ A Fazer',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '1', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-            { id: '2', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '1', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
+        //     { id: '2', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
+        // ])
     },
     {
         id: 'in-progress',
         title: '🚀 Em Andamento',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '3', title: 'Codificar módulo de autenticação', description: 'Implementar login e registro de usuários.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '3', title: 'Codificar módulo de autenticação', description: 'Implementar login e registro de usuários.' },
+        // ])
     },
     {
         id: 'review',
         title: '🧐 Em Revisão',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '4', title: 'Revisar código do backend', description: 'Verificar boas práticas e bugs.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '4', title: 'Revisar código do backend', description: 'Verificar boas práticas e bugs.' },
+        // ])
     },
     {
         id: 'done',
         title: '✅ Concluído',
-        cards: ref([ // <<< MANTENHA O ref([]) AQUI
-            { id: '5', title: 'Deploy para produção', description: 'Finalizar lançamento da versão 1.0.' },
-            { id: '6', title: 'Deploy para produção 2', description: 'Finalizar lançamento da versão 1.0 agora é real.' },
-        ])
+        cards: ref([]),
+        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
+        //     { id: '5', title: 'Deploy para produção', description: 'Finalizar lançamento da versão 1.0.' },
+        //     { id: '6', title: 'Deploy para produção 2', description: 'Finalizar lançamento da versão 1.0 agora é real.' },
+        // ])
     },
 ]);
 
 // --- DEBGUING: ADICIONE ESTES LOGS ---
-onMounted(() => {
-    console.log("KanbanView: columnDefinitions no onMounted:", JSON.parse(JSON.stringify(columnDefinitions.value)));
+onMounted(async () => {
+    //console.log("KanbanView: columnDefinitions no onMounted:", JSON.parse(JSON.stringify(columnDefinitions.value)));
     // Verifique a estrutura de uma coluna específica:
-    console.log("KanbanView: Exemplo de coluna 'todo'.cards:", columnDefinitions.value[0].cards);
-    console.log("KanbanView: Exemplo de coluna 'todo'.cards.value:", columnDefinitions.value[0].cards.value);
+    //console.log("KanbanView: Exemplo de coluna 'todo'.cards:", columnDefinitions.value[0].cards);
+    //console.log("KanbanView: Exemplo de coluna 'todo'.cards.value:", columnDefinitions.value[0].cards.value);
+    try {
+        debugger;
+        let response = await api.get("/tasks/kanban-column-definitions");
+        response = response.data.data;
+
+        debugger;
+        const mappedResponse = response.map(col => ({
+            ...col,
+            cards: ref(col.cards || []) // Certifique-se de que cards é sempre um ref
+        }));
+        columnDefinitions.value = response.data;
+    } catch (error) {
+        throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
+    }
+
 });
 
 // Acompanhe mudanças em columnDefinitions
