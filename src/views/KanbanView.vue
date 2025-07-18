@@ -112,45 +112,22 @@ const columnDefinitions = ref([
 
 // --- DEBGUING: ADICIONE ESTES LOGS ---
 onMounted(async () => {
-    //console.log("KanbanView: columnDefinitions no onMounted:", JSON.parse(JSON.stringify(columnDefinitions.value)));
-    // Verifique a estrutura de uma coluna específica:
-    //console.log("KanbanView: Exemplo de coluna 'todo'.cards:", columnDefinitions.value[0].cards);
-    //console.log("KanbanView: Exemplo de coluna 'todo'.cards.value:", columnDefinitions.value[0].cards.value);
-    try {
-        debugger;
-        let response = await api.get("/tasks/kanban-column-definitions");
-        response = response.data.data;
-
-        debugger;
-        const mappedResponse = response.map(col => ({
-            ...col,
-            cards: ref(col.cards || []) // Certifique-se de que cards é sempre um ref
-        }));
-        columnDefinitions.value = response.data;
-    } catch (error) {
-        throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
-    }
+    await getColumnDefinitions();
 
 });
 
-// Acompanhe mudanças em columnDefinitions
 watch(columnDefinitions, (newVal) => {
     console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
-    // Após a mudança, verifique a estrutura de uma coluna novamente
     if (newVal.length > 0) {
         console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
         if (newVal[0].cards) {
             console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
         }
     }
-}, { deep: true }); // Observe profundamente para pegar mutações internas
-
-// --- FIM DA SEÇÃO DE DEBUGGING ---
+}, { deep: true });
 
 
 const handleCardMoved = (event) => {
-    // ... (sua lógica existente para handleCardMoved permanece a mesma) ...
-    // Se o problema não for na adição, esta parte deve estar funcionando.
     if (event.type === 'added') {
         columnDefinitions.value.forEach(col => {
             if (col.id !== event.targetColumnId) {
@@ -161,7 +138,6 @@ const handleCardMoved = (event) => {
             }
         });
     }
-    // ...
 };
 
 const handleAddCard = ({ columnId, card }) => {
@@ -195,6 +171,39 @@ const handleAddCard = ({ columnId, card }) => {
     targetColumn.cards.push(card);
     console.log(`SUCESSO: Novo card "${card.title}" adicionado à coluna "${columnId}".`);
     console.log(`Estado atualizado da coluna ${columnId}:`, JSON.parse(JSON.stringify(targetColumn.cards.value)));
+};
+
+const getColumnDefinitions = async () => {
+    try {
+        let response = await api.get("/tasks/kanban-column-definitions");
+        response = response.data.data;
+
+        const columns = [];
+
+        for (const item of response) {
+
+            if (columns.some(col => col.id === item.kanbanColumn.id)) {
+                continue; // Ignoring duplicate columns
+
+            } else {
+                columns.push({
+                    id: item.kanbanColumn.id,
+                    title: item.kanbanColumn.name,
+                    cards: ref(response.map(internalItem => {
+                        if (internalItem.columnId === item.kanbanColumn.id) {
+                            return internalItem.task;
+                        }
+
+                    })),
+                });
+            }
+
+        }
+
+        columnDefinitions.value = columns;
+    } catch (error) {
+        throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
+    }
 };
 </script>
 
