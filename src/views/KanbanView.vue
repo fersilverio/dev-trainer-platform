@@ -129,6 +129,7 @@ watch(columnDefinitions, (newVal) => {
 
 const handleCardMoved = (event) => {
     if (event.type === 'added') {
+        // Remove the card from all other columns
         columnDefinitions.value.forEach(col => {
             if (col.id !== event.targetColumnId) {
                 const cardIndex = col.cards.findIndex(c => c.id === event.card.id);
@@ -137,41 +138,65 @@ const handleCardMoved = (event) => {
                 }
             }
         });
+        // Add the card to the target column if not already present
+        const targetColumn = columnDefinitions.value.find(col => col.id === event.targetColumnId);
+        if (targetColumn && !targetColumn.cards.some(c => c.id === event.card.id)) {
+            // Insert at the newIndex if provided, otherwise push to the end
+            if (typeof event.newIndex === 'number') {
+                targetColumn.cards.splice(event.newIndex, 0, event.card);
+            } else {
+                targetColumn.cards.push(event.card);
+            }
+        }
+    } else if (event.type === 'removed') {
+        const sourceColumn = columnDefinitions.value.find(col => col.id === event.sourceColumnId);
+        if (sourceColumn) {
+            const cardIndex = sourceColumn.cards.findIndex(c => c.id === event.card.id);
+            if (cardIndex !== -1) {
+                sourceColumn.cards.splice(cardIndex, 1);
+            }
+        }
+    } else if (event.type === 'movedWithinColumn') {
+        // No action needed, v-model already updates the order
+        console.log("Essa ser a nova ordem", event.newOrder);
+
+        // call backend here to update the order of cards in the column usinf newOrder from event
+
     }
 };
 
-const handleAddCard = ({ columnId, card }) => {
+// const handleAddCard = ({ columnId, card }) => {
 
-    console.log(`handleAddCard acionado para coluna ID: ${columnId}`);
-    console.log("Card a ser adicionado:", card);
+//     console.log(`handleAddCard acionado para coluna ID: ${columnId}`);
+//     console.log("Card a ser adicionado:", card);
 
-    const targetColumn = columnDefinitions.value.find(col => col.id === columnId);
+//     const targetColumn = columnDefinitions.value.find(col => col.id === columnId);
 
-    // --- VERIFICAÇÕES DE ROBUSTEZ MAIS FORTES ---
-    if (!targetColumn) {
-        console.error(`ERRO CRÍTICO: Coluna com ID "${columnId}" não encontrada em columnDefinitions.`);
-        return; // Sai da função se a coluna não for encontrada
-    }
+//     // --- VERIFICAÇÕES DE ROBUSTEZ MAIS FORTES ---
+//     if (!targetColumn) {
+//         console.error(`ERRO CRÍTICO: Coluna com ID "${columnId}" não encontrada em columnDefinitions.`);
+//         return; // Sai da função se a coluna não for encontrada
+//     }
 
-    if (!targetColumn.cards) {
-        console.error(`ERRO CRÍTICO: A propriedade 'cards' está faltando no objeto da coluna ${columnId}.`);
-        console.log("Objeto da coluna encontrado:", JSON.parse(JSON.stringify(targetColumn)));
-        return;
-    }
+//     if (!targetColumn.cards) {
+//         console.error(`ERRO CRÍTICO: A propriedade 'cards' está faltando no objeto da coluna ${columnId}.`);
+//         console.log("Objeto da coluna encontrado:", JSON.parse(JSON.stringify(targetColumn)));
+//         return;
+//     }
 
-    // AQUI É O PONTO CRÍTICO: targetColumn.cards DEVE SER UM REF
-    // if (!targetColumn.cards.value) {
-    //     console.error(`ERRO CRÍTICO: 'targetColumn.cards' não é um ref ou seu .value é undefined para a coluna ${columnId}.`);
-    //     console.log("Valor de targetColumn.cards:", targetColumn.cards); // Isso deve ser um RefImpl
-    //     return;
-    // }
-    // --- FIM DAS VERIFICAÇÕES ---
+//     // AQUI É O PONTO CRÍTICO: targetColumn.cards DEVE SER UM REF
+//     // if (!targetColumn.cards.value) {
+//     //     console.error(`ERRO CRÍTICO: 'targetColumn.cards' não é um ref ou seu .value é undefined para a coluna ${columnId}.`);
+//     //     console.log("Valor de targetColumn.cards:", targetColumn.cards); // Isso deve ser um RefImpl
+//     //     return;
+//     // }
+//     // --- FIM DAS VERIFICAÇÕES ---
 
-    // Se passarmos por todas as verificações, podemos adicionar o card com segurança.
-    targetColumn.cards.push(card);
-    console.log(`SUCESSO: Novo card "${card.title}" adicionado à coluna "${columnId}".`);
-    console.log(`Estado atualizado da coluna ${columnId}:`, JSON.parse(JSON.stringify(targetColumn.cards.value)));
-};
+//     // Se passarmos por todas as verificações, podemos adicionar o card com segurança.
+//     targetColumn.cards.push(card);
+//     console.log(`SUCESSO: Novo card "${card.title}" adicionado à coluna "${columnId}".`);
+//     console.log(`Estado atualizado da coluna ${columnId}:`, JSON.parse(JSON.stringify(targetColumn.cards.value)));
+// };
 
 const getColumnDefinitions = async () => {
     try {

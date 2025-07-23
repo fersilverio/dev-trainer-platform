@@ -86,12 +86,17 @@ const onDraggableChange = (event) => {
     } else if (event.moved) {
         // Card movido DENTRO da mesma coluna.
         // O `v-model` já cuidou da reordenação no `internalColumnCards.value`.
+
+        const newOrderArrayIndexes = internalColumnCards.value.map(card => card.id);
+        console.log("KanbanColumn: Nova ordem dos cards:", newOrderArrayIndexes);
+
         emit('card-moved', {
             type: 'movedWithinColumn',
             targetColumnId: props.columnId,
             card: event.moved.element,
             newIndex: event.moved.newIndex,
             oldIndex: event.moved.oldIndex,
+            newOrder: newOrderArrayIndexes // Envia a nova ordem dos cards
         });
     }
 };
