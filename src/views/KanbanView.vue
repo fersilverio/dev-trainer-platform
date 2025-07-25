@@ -148,6 +148,8 @@ const handleCardMoved = (event) => {
                 targetColumn.cards.push(event.card);
             }
         }
+        console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
+        console.log(`Ids na coluna pos adição:`, targetColumn.cards.map(c => c.id));
     } else if (event.type === 'removed') {
         const sourceColumn = columnDefinitions.value.find(col => col.id === event.sourceColumnId);
         if (sourceColumn) {
@@ -156,6 +158,8 @@ const handleCardMoved = (event) => {
                 sourceColumn.cards.splice(cardIndex, 1);
             }
         }
+        console.log(`Card removido da coluna ${event.sourceColumnId}:`, event.card);
+        console.log(`Ids na coluna pos remoção:`, sourceColumn.cards.map(c => c.id));
     } else if (event.type === 'movedWithinColumn') {
         // No action needed, v-model already updates the order
         console.log("Essa ser a nova ordem", event.newOrder);
@@ -201,12 +205,12 @@ const handleCardMoved = (event) => {
 const getColumnDefinitions = async () => {
     try {
         let response = await api.get("/tasks/kanban-column-definitions");
+
         response = response.data.data;
 
         const columns = [];
 
-        for (const item of response) {
-
+        for (const item of response.filledColumnsDefinitions) {
             if (columns.some(col => col.id === item.kanbanColumn.id)) {
                 continue; // Ignoring duplicate columns
 
@@ -214,18 +218,34 @@ const getColumnDefinitions = async () => {
                 columns.push({
                     id: item.kanbanColumn.id,
                     title: item.kanbanColumn.name,
-                    cards: ref(response.map(internalItem => {
+                    position: item.kanbanColumn.position,
+                    cards: ref(response.filledColumnsDefinitions.map(internalItem => {
                         if (internalItem.columnId === item.kanbanColumn.id) {
                             return internalItem.task;
                         }
 
                     })),
                 });
+
+                if (response.emptyColumns.length > 0) {
+                    response.emptyColumns.forEach(emptyColumn => {
+
+                        columns.push({
+                            id: emptyColumn.id,
+                            title: emptyColumn.name,
+                            position: emptyColumn.position,
+                            cards: ref([]),
+                        });
+
+                    });
+                }
+
             }
 
         }
 
         columnDefinitions.value = columns;
+
     } catch (error) {
         throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
     }
