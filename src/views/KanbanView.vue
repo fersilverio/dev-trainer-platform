@@ -1,10 +1,17 @@
 <template>
-    <div class="kanban-board-container flex flex-grow p-6 bg-gray-50 min-h-screen overflow-hidden">
-        <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
-            <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
-                :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved"
-                @add-card="handleAddCard" class="mr-4 last:mr-0" />
+    <div v-if="!isBusy">
+        <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
+            <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
+                <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
+                    :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved"
+                    @add-card="handleAddCard" class="mr-4 last:mr-0" />
+            </div>
         </div>
+    </div>
+    <div v-else class="mt-60">
+        <svg class="spinner-ring flex justify-content-center m-auto" viewBox="25 25 50 50" stroke-width="5">
+            <circle cx="50" cy="50" r="20" />
+        </svg>
     </div>
 </template>
 
@@ -13,7 +20,9 @@ import { ref, onMounted, watch } from 'vue'; // Adicione onMounted e watch para 
 import KanbanColumn from '../components/KanbanColumn.vue';
 import { api } from '../services/api';
 
-// --- SEÇÃO DE DADOS: VERIFIQUE ESTA PARTE COM CUIDADO ---
+
+const isBusy = ref(false);
+
 const columnDefinitions = ref([
     {
         id: 'in-analysis',
@@ -117,17 +126,17 @@ onMounted(async () => {
 });
 
 watch(columnDefinitions, (newVal) => {
-    console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
-    if (newVal.length > 0) {
-        console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
-        if (newVal[0].cards) {
-            console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
-        }
-    }
+    // console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
+    // if (newVal.length > 0) {
+    //     console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
+    //     if (newVal[0].cards) {
+    //         console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
+    //     }
+    // }
 }, { deep: true });
 
 
-const handleCardMoved = (event) => {
+const handleCardMoved = async (event) => {
     if (event.type === 'added') {
         // Remove the card from all other columns
         columnDefinitions.value.forEach(col => {
@@ -150,6 +159,12 @@ const handleCardMoved = (event) => {
         }
         console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
         console.log(`Ids na coluna pos adição:`, targetColumn.cards.map(c => c.id));
+        const updateRequestObject = {
+            targetColumnTaskIds: targetColumn.cards.map(c => c.id),
+            targetColId: targetColumn.id
+        }
+
+        await api.get("/tasks/reorder-kanban", updateRequestObject);
     } else if (event.type === 'removed') {
         const sourceColumn = columnDefinitions.value.find(col => col.id === event.sourceColumnId);
         if (sourceColumn) {
@@ -160,13 +175,26 @@ const handleCardMoved = (event) => {
         }
         console.log(`Card removido da coluna ${event.sourceColumnId}:`, event.card);
         console.log(`Ids na coluna pos remoção:`, sourceColumn.cards.map(c => c.id));
+        const updateRequestObject = {
+            sourceColumnTaskIds: sourceColumn.cards.map(c => c.id),
+            sourceColId: sourceColumn.id
+        }
+
+        await api.get("/tasks/reorder-kanban", updateRequestObject);
     } else if (event.type === 'movedWithinColumn') {
         // No action needed, v-model already updates the order
-        console.log("Essa ser a nova ordem", event.newOrder);
+        //console.log("Essa ser a nova ordem", event.newOrder);
 
         // call backend here to update the order of cards in the column usinf newOrder from event
 
     }
+    const updateRequestObject = {
+        tarputColumnId: event.targetColumnId,
+        newOrder: event.newOrder,
+    };
+    console.log("aconteceu o evento de movimentação de card", event.type);
+    await api.get("/tasks/reorder-kanban", updateRequestObject);
+    //console.log("Estado do Kanban após movimentação:", JSON.parse(JSON.stringify(boardNewState)));
 };
 
 // const handleAddCard = ({ columnId, card }) => {
@@ -204,6 +232,7 @@ const handleCardMoved = (event) => {
 
 const getColumnDefinitions = async () => {
     try {
+        isBusy.value = true;
         let response = await api.get("/tasks/kanban-column-definitions");
 
         response = response.data.data;
@@ -239,7 +268,6 @@ const getColumnDefinitions = async () => {
 
                     });
                 }
-
             }
 
         }
@@ -248,6 +276,8 @@ const getColumnDefinitions = async () => {
 
     } catch (error) {
         throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
+    } finally {
+        isBusy.value = false;
     }
 };
 </script>
