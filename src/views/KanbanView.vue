@@ -160,9 +160,10 @@ const handleCardMoved = async (event) => {
         console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
         console.log(`Ids na coluna pos adição:`, targetColumn.cards.map(c => c.id));
 
-
+        debugger;
+        console.log(targetColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }))
         await api.put("/tasks/reorder-kanban-column", {
-            newOrderArray: targetColumn.cards.map(c => c.id),
+            newOrderArray: targetColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
             columnId: targetColumn.id
         });
     } else if (event.type === 'removed') {
@@ -178,7 +179,7 @@ const handleCardMoved = async (event) => {
 
 
         await api.put("/tasks/reorder-kanban-column", {
-            newOrderArray: sourceColumn.cards.map(c => c.id),
+            newOrderArray: sourceColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
             columnId: sourceColumn.id
         });
     } else if (event.type === 'movedWithinColumn') {
@@ -246,6 +247,7 @@ const getColumnDefinitions = async () => {
                 cards: cards.map(card => ({
                     id: card.id,
                     title: card.task.title,
+                    taskId: card.task.id,
                     description: card.task.deliverableExplanation,
                     userResponsible: card.task.assignedTo,
                     priority: card.task.priority,

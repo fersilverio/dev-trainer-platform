@@ -70,6 +70,7 @@ const onDraggableChange = (event) => {
     // 2. Emite um evento 'card-moved' para o componente pai
     // Este evento é usado para o pai gerenciar a lógica de movimento entre colunas.
     if (event.added) {
+        debugger;
         emit('card-moved', {
             type: 'added',
             targetColumnId: props.columnId, // ID desta coluna
