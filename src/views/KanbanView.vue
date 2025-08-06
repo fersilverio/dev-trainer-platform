@@ -3,8 +3,7 @@
         <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
             <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
                 <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
-                    :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved"
-                    @add-card="handleAddCard" class="mr-4 last:mr-0" />
+                    :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved" />
             </div>
         </div>
     </div>
@@ -15,10 +14,45 @@
     </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue'; // Adicione onMounted e watch para depuração
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'; // Adicione onMounted e watch para depuração
 import KanbanColumn from '../components/KanbanColumn.vue';
 import { api } from '../services/api';
+import type KanbanCard from '../components/KanbanCard.vue';
+import type { AxiosResponse } from 'axios';
+
+
+type CardMovedEvent =
+    | {
+        type: 'added';
+        targetColumnId: string;
+        card: KanbanCard;
+        newIndex: number;
+    }
+    | {
+        type: 'removed';
+        sourceColumnId: string;
+        card: KanbanCard;
+        oldIndex: number;
+    }
+    | {
+        type: 'movedWithinColumn';
+        targetColumnId: string;
+        card: KanbanCard;
+        newIndex: number;
+        oldIndex: number;
+        newOrder: string[];
+    };
+
+type KanbanCard = {
+    id: string;
+    title: string;
+    taskId: string;
+    description: string;
+    userResponsible: string;
+    priority: number;
+    deadline: string;
+};
 
 
 const isBusy = ref(false);
@@ -27,121 +61,73 @@ const columnDefinitions = ref([
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     {
-        //         id: '15',
-        //         title: 'Criar tabelas de usuário para autenticação',
-        //         description: 'Implementação inicial do sistema',
-        //         userResponsible: "Fernando Silva Silvério",
-        //         priority: 1,
-        //         deadline: "2025/10/10"
-        //     },
-        //     { id: '16', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        // ])
+        cards: [] as KanbanCard[],
+        // cards: [ ... ]
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     {
-        //         id: '13', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.', userResponsible: "Jorge Valdivia",
-        //         priority: 2,
-        //         deadline: "2025/10/10"
-        //     },
-        //     {
-        //         id: '14', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.', userResponsible: "Arjen Robben", priority: 3,
-        //         deadline: "2025/10/10"
-        //     },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '11', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-        //     { id: '12', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '9', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-        //     { id: '10', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'in-analysis',
         title: '✍️ Em analise',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '7', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-        //     { id: '8', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'todo',
         title: '✍️ A Fazer',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '1', title: 'Comprar materiais de escritório', description: 'Canetas, papel, clips.' },
-        //     { id: '2', title: 'Agendar reunião com o cliente', description: 'Discutir requisitos do projeto X.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'in-progress',
         title: '🚀 Em Andamento',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '3', title: 'Codificar módulo de autenticação', description: 'Implementar login e registro de usuários.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'review',
         title: '🧐 Em Revisão',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '4', title: 'Revisar código do backend', description: 'Verificar boas práticas e bugs.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
     {
         id: 'done',
         title: '✅ Concluído',
-        cards: ref([]),
-        // cards: ref([ // <<< MANTENHA O ref([]) AQUI
-        //     { id: '5', title: 'Deploy para produção', description: 'Finalizar lançamento da versão 1.0.' },
-        //     { id: '6', title: 'Deploy para produção 2', description: 'Finalizar lançamento da versão 1.0 agora é real.' },
-        // ])
+        cards: [] as KanbanCard[],
     },
 ]);
 
-// --- DEBGUING: ADICIONE ESTES LOGS ---
 onMounted(async () => {
     await getColumnDefinitions();
 
 });
 
-watch(columnDefinitions, (newVal) => {
-    // console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
-    // if (newVal.length > 0) {
-    //     console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
-    //     if (newVal[0].cards) {
-    //         console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
-    //     }
-    // }
-}, { deep: true });
+// watch(columnDefinitions, (newVal) => {
+//     // console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
+//     // if (newVal.length > 0) {
+//     //     console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
+//     //     if (newVal[0].cards) {
+//     //         console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
+//     //     }
+//     // }
+// }, { deep: true });
 
 
-const handleCardMoved = async (event) => {
+const handleCardMoved = async (event: CardMovedEvent) => {
     if (event.type === 'added') {
         // Remove the card from all other columns
         columnDefinitions.value.forEach(col => {
             if (col.id !== event.targetColumnId) {
-                const cardIndex = col.cards.findIndex(c => c.id === event.card.id);
+                const cardIndex = col.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
                 if (cardIndex !== -1) {
                     col.cards.splice(cardIndex, 1);
                 }
@@ -149,39 +135,37 @@ const handleCardMoved = async (event) => {
         });
         // Add the card to the target column if not already present
         const targetColumn = columnDefinitions.value.find(col => col.id === event.targetColumnId);
-        if (targetColumn && !targetColumn.cards.some(c => c.id === event.card.id)) {
-            // Insert at the newIndex if provided, otherwise push to the end
-            if (typeof event.newIndex === 'number') {
-                targetColumn.cards.splice(event.newIndex, 0, event.card);
-            } else {
-                targetColumn.cards.push(event.card);
+        if (targetColumn) {
+            if (!targetColumn.cards.some((c: KanbanCard) => c.id === event.card.id)) {
+                // Insert at the newIndex if provided, otherwise push to the end
+                if (typeof event.newIndex === 'number') {
+                    targetColumn.cards.splice(event.newIndex, 0, event.card);
+                } else {
+                    targetColumn.cards.push(event.card);
+                }
             }
+            console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
+            console.log(`Ids na coluna pos adição:`, targetColumn.cards.map((c: KanbanCard) => c.id));
+            console.log(targetColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }))
+            await api.put("/tasks/reorder-kanban-column", {
+                newOrderArray: targetColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
+                columnId: targetColumn.id
+            });
         }
-        console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
-        console.log(`Ids na coluna pos adição:`, targetColumn.cards.map(c => c.id));
-
-        debugger;
-        console.log(targetColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }))
-        await api.put("/tasks/reorder-kanban-column", {
-            newOrderArray: targetColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
-            columnId: targetColumn.id
-        });
     } else if (event.type === 'removed') {
         const sourceColumn = columnDefinitions.value.find(col => col.id === event.sourceColumnId);
         if (sourceColumn) {
-            const cardIndex = sourceColumn.cards.findIndex(c => c.id === event.card.id);
+            const cardIndex = sourceColumn.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
             if (cardIndex !== -1) {
                 sourceColumn.cards.splice(cardIndex, 1);
             }
+            console.log(`Card removido da coluna ${event.sourceColumnId}:`, event.card);
+            console.log(`Ids na coluna pos remoção:`, sourceColumn.cards.map((c: KanbanCard) => c.id));
+            await api.put("/tasks/reorder-kanban-column", {
+                newOrderArray: sourceColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
+                columnId: sourceColumn.id
+            });
         }
-        console.log(`Card removido da coluna ${event.sourceColumnId}:`, event.card);
-        console.log(`Ids na coluna pos remoção:`, sourceColumn.cards.map(c => c.id));
-
-
-        await api.put("/tasks/reorder-kanban-column", {
-            newOrderArray: sourceColumn.cards.map(c => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
-            columnId: sourceColumn.id
-        });
     } else if (event.type === 'movedWithinColumn') {
         // No action needed, v-model already updates the order
         //console.log("Essa ser a nova ordem", event.newOrder);
@@ -230,21 +214,23 @@ const handleCardMoved = async (event) => {
 const getColumnDefinitions = async () => {
     try {
         isBusy.value = true;
-        let response = await api.get("/tasks/kanban-column-definitions");
-        debugger;
-        response = response.data.data;
 
-        const columnIds = new Set(response.filledColumnsDefinitions.map(item => item.columnId));
+        const response: AxiosResponse<{ data: { filledColumnsDefinitions: any[]; emptyColumns: any[] } }> = await api.get("/tasks/kanban-column-definitions");
+
+        const { filledColumnsDefinitions, emptyColumns } = response.data.data;
+
+        const columnIds = new Set(filledColumnsDefinitions.map((item: any) => item.columnId));
+
         const finalColumnsSetup = [];
 
         for (const columnId of columnIds.values()) {
-            const cards = response.filledColumnsDefinitions.filter(item => item.columnId === columnId);
+            const cards = filledColumnsDefinitions.filter((item: any) => item.columnId === columnId);
 
             const columnInfo = {
-                id: columnId,
-                position: response.filledColumnsDefinitions.find(item => item.columnId === columnId).kanbanColumn.position,
-                title: response.filledColumnsDefinitions.find(item => item.columnId === columnId).kanbanColumn.name,
-                cards: cards.map(card => ({
+                id: String(columnId),
+                position: filledColumnsDefinitions.find((item: any) => item.columnId === columnId).kanbanColumn.position,
+                title: filledColumnsDefinitions.find((item: any) => item.columnId === columnId).kanbanColumn.name,
+                cards: cards.map((card: any) => ({
                     id: card.id,
                     title: card.task.title,
                     taskId: card.task.id,
@@ -252,16 +238,39 @@ const getColumnDefinitions = async () => {
                     userResponsible: card.task.assignedTo,
                     priority: card.task.priority,
                     deadline: card.task.deadline
-                }))
+                })) as KanbanCard[]
             };
 
             finalColumnsSetup.push(columnInfo);
+
+            if (emptyColumns.length > 0) {
+                const emptyColumn = emptyColumns.find((column) => column.id === columnId);
+                if (emptyColumn) {
+                    finalColumnsSetup.push({
+                        id: String(emptyColumn.columnId),
+                        position: emptyColumn.kanbanColumn.position,
+                        title: emptyColumn.kanbanColumn.name,
+                        cards: [] as KanbanCard[]
+                    });
+                }
+            }
+        }
+
+        for (const emptyColumn of emptyColumns) {
+            if (!columnIds.has(emptyColumn.columnId)) {
+                finalColumnsSetup.push({
+                    id: emptyColumn.columnId,
+                    position: emptyColumn.position,
+                    title: emptyColumn.name,
+                    cards: [] as KanbanCard[]
+                });
+            }
+
         }
 
         columnDefinitions.value = finalColumnsSetup.sort((a, b) => a.position - b.position);
 
-
-    } catch (error) {
+    } catch (error: any) {
         throw new Error(`Erro ao buscar colunas do Kanban: ${error.message}`);
     } finally {
         isBusy.value = false;
