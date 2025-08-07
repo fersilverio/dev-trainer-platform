@@ -37,9 +37,37 @@
                     <span>23</span>
                 </div>
             </div>
-
+            {{ projects }}
         </div>
     </div>
 </template>
-<script setup>
+<script setup lang="ts">
+import { ref, onMounted } from 'vue';
+import { api } from '../services/api';
+import type { AxiosResponse } from 'axios';
+
+
+interface Project {
+    id: number;
+    code: string;
+    name: string;
+    niche: string;
+    description: string;
+    ownerId: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+const projects = ref<Project[]>([]);
+
+const getProjects = async () => {
+    const apiResponse: AxiosResponse<Project[]> = await api.get("/projects");
+    projects.value = apiResponse.data;
+};
+
+onMounted(async () => {
+    await getProjects();
+});
+
+
 </script>
