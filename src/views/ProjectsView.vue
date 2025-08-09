@@ -29,7 +29,7 @@
             <div class="modal">
                 <label class="modal-overlay" for="modal-1"></label>
                 <div class="modal-content flex flex-col gap-5">
-                    <NewProjectCreationModal />
+                    <NewProjectCreationModal @project-created="getProjects()" />
                 </div>
             </div>
         </div>
