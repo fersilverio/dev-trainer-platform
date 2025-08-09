@@ -5,45 +5,17 @@
             <span class="tooltip tooltip-left text-white" data-tooltip="Adicionar projeto."><button>+</button></span>
         </div>
         <div class="mt-2 grid grid-cols-3 gap-4">
-            <div class="bg-indigo-900 p-5 rounded-md">
-                <p>Ifood Clone</p>
-                <p>Descrição sucinta do projeto e bla bla bla</p>
-                <div class="flex justify-start items-center mt-1 gap-4">
-                    <span>23</span>
-                    <span>23</span>
-                </div>
+
+            <div v-for="project in projects" :key="project.id">
+                <ProjectCard :project="project" />
             </div>
-            <div class="bg-indigo-900 p-5 rounded-md">
-                <p>Ifood Clone</p>
-                <p>Descrição sucinta do projeto e bla bla bla</p>
-                <div class="flex justify-start items-center mt-1 gap-4">
-                    <span>23</span>
-                    <span>23</span>
-                </div>
-            </div>
-            <div class="bg-indigo-900 p-5 rounded-md">
-                <p>Ifood Clone</p>
-                <p>Descrição sucinta do projeto e bla bla bla</p>
-                <div class="flex justify-start items-center mt-1 gap-4">
-                    <span>23</span>
-                    <span>23</span>
-                </div>
-            </div>
-            <div class="bg-indigo-900 p-5 rounded-md">
-                <p>Ifood Clone</p>
-                <p>Descrição sucinta do projeto e bla bla bla</p>
-                <div class="flex justify-start items-center mt-1 gap-4">
-                    <span>23</span>
-                    <span>23</span>
-                </div>
-            </div>
-            {{ projects }}
         </div>
     </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { api } from '../services/api';
+import ProjectCard from '../components/ProjectCard.vue';
 import type { AxiosResponse } from 'axios';
 
 
