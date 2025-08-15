@@ -1,7 +1,7 @@
 <template>
     <div v-if="!isBusy">
         <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
-            <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0">
+            <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0 gap-4">
                 <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
                     :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved" />
             </div>
@@ -15,11 +15,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'; // Adicione onMounted e watch para depuração
+import { ref, onMounted, computed } from 'vue';
 import KanbanColumn from '../components/KanbanColumn.vue';
 import { api } from '../services/api';
 import type KanbanCard from '../components/KanbanCard.vue';
 import type { AxiosResponse } from 'axios';
+import { useRoute } from 'vue-router';
 
 
 type CardMovedEvent =
@@ -55,6 +56,10 @@ type KanbanCard = {
 };
 
 
+const route = useRoute();
+
+const projectId = computed(() => route.params.projectId);
+
 const isBusy = ref(false);
 
 const columnDefinitions = ref([
@@ -62,48 +67,28 @@ const columnDefinitions = ref([
         id: 1,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
-        // cards: [ ... ]
     },
     {
         id: 2,
-        title: '✍️ Em analise',
+        title: '📝 Em desenvolvimento',
         cards: [] as KanbanCard[],
     },
     {
         id: 3,
-        title: '✍️ Em analise',
+        title: '🔍 Em testes',
         cards: [] as KanbanCard[],
     },
     {
         id: 4,
-        title: '✍️ Em analise',
+        title: '📦 Preparando entrega',
         cards: [] as KanbanCard[],
     },
     {
         id: 5,
-        title: '✍️ Em analise',
+        title: '📬 Entregue',
         cards: [] as KanbanCard[],
     },
-    {
-        id: 6,
-        title: '✍️ A Fazer',
-        cards: [] as KanbanCard[],
-    },
-    {
-        id: 7,
-        title: '🚀 Em Andamento',
-        cards: [] as KanbanCard[],
-    },
-    {
-        id: 8,
-        title: '🧐 Em Revisão',
-        cards: [] as KanbanCard[],
-    },
-    {
-        id: 9,
-        title: '✅ Concluído',
-        cards: [] as KanbanCard[],
-    },
+
 ]);
 
 onMounted(async () => {
@@ -111,74 +96,38 @@ onMounted(async () => {
 
 });
 
-// watch(columnDefinitions, (newVal) => {
-//     // console.log("KanbanView: columnDefinitions MUDOU:", JSON.parse(JSON.stringify(newVal)));
-//     // if (newVal.length > 0) {
-//     //     console.log("KanbanView: Exemplo de coluna 'todo'.cards APÓS MUDANÇA:", newVal[0].cards);
-//     //     if (newVal[0].cards) {
-//     //         console.log("KanbanView: Exemplo de coluna 'todo'.cards.value APÓS MUDANÇA:", newVal[0].cards.value);
-//     //     }
-//     // }
-// }, { deep: true });
-
 
 const handleCardMoved = async (event: CardMovedEvent) => {
-    debugger;
-    if (event.type === 'added') {
-        // Remover o card de todas as colunas (garantindo que não haja duplicidade)
-        columnDefinitions.value.forEach(col => {
-            if (String(col.id) !== String(event.targetColumnId)) {
-                const cardIndex = col.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
-                if (cardIndex !== -1) {
-                    col.cards.splice(cardIndex, 1);
+    switch (event.type) {
+        case 'added': {
+            removeCardFromAllColumnsExcept(event.card.id, event.targetColumnId);
+
+            const targetColumn = findColumnById(event.targetColumnId);
+            if (targetColumn) {
+                addCardToColumn(targetColumn, event.card, event.newIndex);
+                await updateColumnOrder(targetColumn.id, targetColumn.cards);
+            }
+            break;
+        }
+
+        case 'removed': {
+            const sourceColumn = findColumnById(event.sourceColumnId);
+            if (sourceColumn) {
+                const wasRemoved = removeCardFromColumn(sourceColumn, event.card.id);
+                if (wasRemoved) {
+                    await updateColumnOrder(sourceColumn.id, sourceColumn.cards);
                 }
             }
-        });
-
-        // Adicionar o card na coluna de destino no índice correto
-        const targetColumn = columnDefinitions.value.find(col => String(col.id) === String(event.targetColumnId));
-        if (targetColumn) {
-            // Remover o card se já existir (evita duplicidade)
-            const existingIndex = targetColumn.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
-            if (existingIndex !== -1) {
-                targetColumn.cards.splice(existingIndex, 1);
-            }
-            // Inserir no índice informado
-            if (typeof event.newIndex === 'number') {
-                targetColumn.cards.splice(event.newIndex, 0, event.card);
-            } else {
-                targetColumn.cards.push(event.card);
-            }
-
-            // Atualizar backend com a nova ordem
-            await api.put("/tasks/reorder-kanban-column", {
-                newOrderArray: targetColumn.cards.map((c: KanbanCard) => ({ kanbanRegistryId: c.id, taskId: c.taskId })),
-                columnId: targetColumn.id
-            });
+            break;
         }
-    } else if (event.type === 'removed') {
-        const sourceColumn = columnDefinitions.value.find(col => col.id === +event.sourceColumnId);
-        if (sourceColumn) {
-            const cardIndex = sourceColumn.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
-            if (cardIndex !== -1) {
-                sourceColumn.cards.splice(cardIndex, 1);
-            }
-            console.log(`Card removido da coluna ${event.sourceColumnId}:`, event.card);
-            console.log(`Ids na coluna pos remoção:`, sourceColumn.cards.map((c: KanbanCard) => c.id));
+
+        case 'movedWithinColumn': {
             await api.put("/tasks/reorder-kanban-column", {
-                newOrderArray: sourceColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
-                columnId: sourceColumn.id
+                columnId: event.targetColumnId,
+                newOrderArray: event.newOrder,
             });
+            break;
         }
-    } else if (event.type === 'movedWithinColumn') {
-        // No action needed, v-model already updates the order
-        //console.log("Essa ser a nova ordem", event.newOrder);
-
-
-        await api.put("/tasks/reorder-kanban-column", {
-            columnId: event.targetColumnId,
-            newOrderArray: event.newOrder,
-        });
     }
 };
 
@@ -215,11 +164,53 @@ const handleCardMoved = async (event: CardMovedEvent) => {
 //     console.log(`Estado atualizado da coluna ${columnId}:`, JSON.parse(JSON.stringify(targetColumn.cards.value)));
 // };
 
+const findColumnById = (columnId: string | number) => {
+    return columnDefinitions.value.find(col => String(col.id) === String(columnId));
+};
+
+const removeCardFromColumn = (column: any, cardId: string | number) => {
+    const cardIndex = column.cards.findIndex((c: KanbanCard) => c.id === cardId);
+    if (cardIndex !== -1) {
+        column.cards.splice(cardIndex, 1);
+    }
+    return cardIndex !== -1;
+};
+
+const removeCardFromAllColumnsExcept = (cardId: string | number, excludeColumnId: string | number) => {
+    columnDefinitions.value.forEach(col => {
+        if (String(col.id) !== String(excludeColumnId)) {
+            removeCardFromColumn(col, cardId);
+        }
+    });
+};
+
+const addCardToColumn = (column: any, card: KanbanCard, index?: number) => {
+
+    removeCardFromColumn(column, card.id);
+
+    if (typeof index === 'number') {
+        column.cards.splice(index, 0, card);
+    } else {
+        column.cards.push(card);
+    }
+};
+
+const updateColumnOrder = async (columnId: string | number, cards: KanbanCard[]) => {
+    await api.put("/tasks/reorder-kanban-column", {
+        newOrderArray: cards.map((c: KanbanCard) => ({
+            kanbanRegistryId: c.id,
+            taskId: c.taskId
+        })),
+        columnId
+    });
+};
+
+
 const getColumnDefinitions = async () => {
     try {
         isBusy.value = true;
 
-        const response: AxiosResponse<{ data: { filledColumnsDefinitions: any[]; emptyColumns: any[] } }> = await api.get("/tasks/kanban-column-definitions");
+        const response: AxiosResponse<{ data: { filledColumnsDefinitions: any[]; emptyColumns: any[] } }> = await api.get(`/tasks/${projectId.value}/kanban-column-definitions`);
 
         const { filledColumnsDefinitions, emptyColumns } = response.data.data;
 

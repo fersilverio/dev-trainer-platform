@@ -1,11 +1,11 @@
 <template>
-    <div class="kanban-card bg-white border-l-4 border-l-blue-200 rounded-md p-3 mb-2 shadow-sm cursor-grab">
+    <div class="kanban-card bg-slate-900 border-l-4 border-l-blue-600 rounded-md p-3 mb-2 shadow-sm cursor-grab">
         <div class="flex flex-col h-full justify-between overflow-x-hidden">
-            <div v-if="card.description" class="text-sm text-gray-600 mt-1 truncate">{{
+            <div v-if="card.description" class="text-sm text-gray-400 mt-1 truncate">{{
                 card.description }}
             </div>
             <span class="tooltip tooltip-right" :data-tooltip="card.title">
-                <div class="font-semibold text-gray-800 truncate w-[250px]">
+                <div class="font-semibold text-white truncate w-[250px]">
                     {{ card.title }}
                 </div>
             </span>
@@ -13,7 +13,7 @@
                 <label class="btn btn-ghost flex cursor-pointer m-1 px-0 avatar avatar-ring avatar-sm" tabindex="0">
                     <img src="https://i.pravatar.cc/150?u=a042581f4e29026024d" alt="avatar" />
                 </label>
-                <p class="text-gray-500 text-sm">{{ card.userResponsible ?? "Sem responsável" }}</p>
+                <p class="text-gray-500 text-sm mt-1">{{ card.userResponsible ?? "Sem responsável" }}</p>
             </div>
             <div class="flex justify-end align-middle gap-2">
                 <span class="badge border-gray-500 bg-gray-100 text-gray-600 h-5 mt-2">

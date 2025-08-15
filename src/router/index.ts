@@ -11,7 +11,7 @@ const router = createRouter({
             component: HomeView
         },
         {
-            path: '/kanban',
+            path: '/kanban/:projectId',
             name: 'kanban',
             component: KanbanView,
         },

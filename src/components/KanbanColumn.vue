@@ -1,6 +1,6 @@
 <template>
     <div
-        class="kanban-column flex flex-col bg-gray-100 border border-gray-300 rounded-lg shadow-md w-[300px] flex-shrink-0">
+        class="kanban-column flex flex-col bg-gray-800 border border-gray-700 rounded-lg shadow-md w-[300px] flex-shrink-0">
         <div class="kanban-column-header bg-gray-950 text-white p-3 rounded-t-lg font-bold text-lg text-center">
             {{ title }}
         </div>
