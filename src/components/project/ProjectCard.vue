@@ -1,5 +1,6 @@
 <template>
-    <div class="bg-slate-800 p-5 rounded-md min-h-50">
+    <div
+        class="bg-slate-800 p-5 rounded-md min-h-50 transition-all duration-300 hover:bg-slate-700 hover:-translate-y-1 cursor-pointer">
         <div class="flex justify-between items-center">
             <p class="text-white text-xl font-bold">{{ projectKardFullTitle }}</p>
             <span class="tooltip tooltip-left text-white" :data-tooltip="`Criado por: ${props.project.owner.name}`">
@@ -17,7 +18,7 @@
                 <div class="flex justify-start items-center gap-4">
                     <span>
                         <div class="text-xl font-bold">
-                            23
+                            {{ props.project.projectTasksInfo.numberOfTasks }}
                         </div>
                         <div class="text-xs">
                             Tarefas
@@ -25,7 +26,7 @@
                     </span>
                     <span>
                         <div class="text-xl font-bold">
-                            23
+                            {{ props.project.projectTasksInfo.numberOfFinishedTasks }}
                         </div>
                         <div class="text-xs">
                             Realizadas
@@ -34,13 +35,15 @@
                 </div>
             </div>
             <div class="flex-col">
-                <span class="text-3xl font-bold">100%</span>
+                <span class="text-3xl font-bold">{{ projectCompletedPercentage }}%</span>
             </div>
         </div>
 
     </div>
 </template>
 <script setup lang="ts">
+import { computed } from 'vue';
+
 const props = defineProps<{
     project: {
         id: number;
@@ -49,14 +52,23 @@ const props = defineProps<{
         niche: string;
         description: string;
         owner: {
-            id: number;
             name: string;
         };
         createdAt: string;
         updatedAt: string;
+        projectTasksInfo: {
+            numberOfTasks: number;
+            numberOfFinishedTasks: number;
+        };
     }
 }>();
 
 const projectKardFullTitle = `[${props.project.code}]  ${props.project.name}`;
+
+const projectCompletedPercentage = computed(() => {
+    const totalTasks = props.project.projectTasksInfo.numberOfTasks;
+    const finishedTasks = props.project.projectTasksInfo.numberOfFinishedTasks;
+    return totalTasks > 0 ? Math.round((finishedTasks / totalTasks) * 100) : 0;
+});
 
 </script>

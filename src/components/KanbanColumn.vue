@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, defineEmits, toRefs, watch } from 'vue';
 import draggable from 'vuedraggable';
 import KanbanCard from './KanbanCard.vue'; // Importe o componente do card
 
@@ -51,15 +51,8 @@ const props = defineProps({
 
 const emit = defineEmits(['update:cards', 'card-moved', 'add-card']);
 
-// Cria um ref local que é uma cópia da prop 'cards'.
-// O vuedraggable vai operar diretamente neste 'internalColumnCards'.
-const internalColumnCards = ref([...props.cards]);
-
-// WATCHER: Garante que 'internalColumnCards' seja atualizado
-// caso a prop 'cards' mude do componente pai.
-watch(() => props.cards, (newVal) => {
-    internalColumnCards.value = [...newVal];
-}, { deep: true }); // 'deep: true' é importante para arrays de objetos.
+// Usa toRefs para garantir reatividade direta do array do pai
+const { cards: internalColumnCards } = toRefs(props);
 
 const onDraggableChange = (event) => {
     // 1. Atualiza a prop `cards` do componente pai via `v-model`

@@ -42,10 +42,10 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { api } from '../services/api';
-import ProjectCard from '../components/ProjectCard.vue';
-import type { AxiosResponse } from 'axios';
-import NewProjectCreationModal from '../components/NewProjectCreationModal.vue';
+import ProjectCard from '../components/project/ProjectCard.vue';
+import NewProjectCreationModal from '../components/project/NewProjectCreationModal.vue';
 
+import type { AxiosResponse } from 'axios';
 
 interface Project {
     id: number;
@@ -54,11 +54,14 @@ interface Project {
     niche: string;
     description: string;
     owner: {
-        id: number;
         name: string;
     };
     createdAt: string;
     updatedAt: string;
+    projectTasksInfo: {
+        numberOfTasks: number;
+        numberOfFinishedTasks: number;
+    };
 }
 
 const projects = ref<Project[]>([]);

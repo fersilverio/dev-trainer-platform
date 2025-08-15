@@ -45,7 +45,7 @@ type CardMovedEvent =
     };
 
 type KanbanCard = {
-    id: string;
+    id: number;
     title: string;
     taskId: string;
     description: string;
@@ -59,48 +59,48 @@ const isBusy = ref(false);
 
 const columnDefinitions = ref([
     {
-        id: 'in-analysis',
+        id: 1,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
         // cards: [ ... ]
     },
     {
-        id: 'in-analysis',
+        id: 2,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'in-analysis',
+        id: 3,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'in-analysis',
+        id: 4,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'in-analysis',
+        id: 5,
         title: '✍️ Em analise',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'todo',
+        id: 6,
         title: '✍️ A Fazer',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'in-progress',
+        id: 7,
         title: '🚀 Em Andamento',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'review',
+        id: 8,
         title: '🧐 Em Revisão',
         cards: [] as KanbanCard[],
     },
     {
-        id: 'done',
+        id: 9,
         title: '✅ Concluído',
         cards: [] as KanbanCard[],
     },
@@ -123,37 +123,41 @@ onMounted(async () => {
 
 
 const handleCardMoved = async (event: CardMovedEvent) => {
+    debugger;
     if (event.type === 'added') {
-        // Remove the card from all other columns
+        // Remover o card de todas as colunas (garantindo que não haja duplicidade)
         columnDefinitions.value.forEach(col => {
-            if (col.id !== event.targetColumnId) {
+            if (String(col.id) !== String(event.targetColumnId)) {
                 const cardIndex = col.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
                 if (cardIndex !== -1) {
                     col.cards.splice(cardIndex, 1);
                 }
             }
         });
-        // Add the card to the target column if not already present
-        const targetColumn = columnDefinitions.value.find(col => col.id === event.targetColumnId);
+
+        // Adicionar o card na coluna de destino no índice correto
+        const targetColumn = columnDefinitions.value.find(col => String(col.id) === String(event.targetColumnId));
         if (targetColumn) {
-            if (!targetColumn.cards.some((c: KanbanCard) => c.id === event.card.id)) {
-                // Insert at the newIndex if provided, otherwise push to the end
-                if (typeof event.newIndex === 'number') {
-                    targetColumn.cards.splice(event.newIndex, 0, event.card);
-                } else {
-                    targetColumn.cards.push(event.card);
-                }
+            // Remover o card se já existir (evita duplicidade)
+            const existingIndex = targetColumn.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
+            if (existingIndex !== -1) {
+                targetColumn.cards.splice(existingIndex, 1);
             }
-            console.log(`Card adicionado à coluna ${event.targetColumnId}:`, event.card);
-            console.log(`Ids na coluna pos adição:`, targetColumn.cards.map((c: KanbanCard) => c.id));
-            console.log(targetColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }))
+            // Inserir no índice informado
+            if (typeof event.newIndex === 'number') {
+                targetColumn.cards.splice(event.newIndex, 0, event.card);
+            } else {
+                targetColumn.cards.push(event.card);
+            }
+
+            // Atualizar backend com a nova ordem
             await api.put("/tasks/reorder-kanban-column", {
-                newOrderArray: targetColumn.cards.map((c: KanbanCard) => { return { kanbanRegistryId: c.id, taskId: c.taskId } }),
+                newOrderArray: targetColumn.cards.map((c: KanbanCard) => ({ kanbanRegistryId: c.id, taskId: c.taskId })),
                 columnId: targetColumn.id
             });
         }
     } else if (event.type === 'removed') {
-        const sourceColumn = columnDefinitions.value.find(col => col.id === event.sourceColumnId);
+        const sourceColumn = columnDefinitions.value.find(col => col.id === +event.sourceColumnId);
         if (sourceColumn) {
             const cardIndex = sourceColumn.cards.findIndex((c: KanbanCard) => c.id === event.card.id);
             if (cardIndex !== -1) {
