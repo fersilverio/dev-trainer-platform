@@ -17,7 +17,7 @@
             </div>
             <div class="flex justify-end align-middle gap-2">
                 <span class="badge border-gray-500 bg-gray-100 text-gray-600 h-5 mt-2">
-                    {{ card.deadline ?? "--/--/--" }}
+                    {{ formatDate(card.deadline) ?? "--/--/--" }}
                 </span>
                 <PriorityBadge :priority="card.priority" />
             </div>
@@ -28,6 +28,7 @@
 
 <script setup>
 import PriorityBadge from './PriorityBadge.vue';
+import { formatDate } from '../services/date-format';
 
 const props = defineProps({
     card: {
