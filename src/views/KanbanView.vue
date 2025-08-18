@@ -1,9 +1,15 @@
 <template>
     <div v-if="!isBusy">
-        <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
-            <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0 gap-4">
-                <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
-                    :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved" />
+        <div v-if="!columnDefinitions.length" class="mt-60 text-center text-gray-500">
+            Nenhuma coluna de kanban ou tarefas encontradas para este projeto.
+        </div>
+
+        <div v-else>
+            <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
+                <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0 gap-4">
+                    <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
+                        :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved" />
+                </div>
             </div>
         </div>
     </div>
