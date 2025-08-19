@@ -1,11 +1,26 @@
 <template>
     <div v-if="!isBusy">
         <div v-if="!columnDefinitions.length" class="mt-60 text-center text-gray-500">
-            Nenhuma coluna de kanban ou tarefas encontradas para este projeto.
+            <div class="flex flex-col items-center gap-4">
+                <p>Nenhuma coluna de kanban ou tarefas encontradas para este projeto.</p>
+                <RouterLink :to="{ name: 'project-settings', params: { projectId: projectId } }">
+                    <button class="btn btn-primary text-lg">
+                        Acessar configurações do projeto
+                    </button>
+                </RouterLink>
+            </div>
         </div>
 
         <div v-else>
             <div class="kanban-board-container flex flex-grow p-6 bg-gray-950 min-h-screen overflow-hidden">
+                <div class="flex justify-between items-start flex-start">
+                    <RouterLink :to="{ name: 'project-settings', params: { projectId: projectId } }">
+                        <button class="btn btn-outline-primary text-sm p-3">
+                            <i class="fa-solid fa-wrench"></i>
+                        </button>
+                    </RouterLink>
+
+                </div>
                 <div class="flex overflow-x-auto full-hd:w-[1700px] ultrawide:w-[2300px] flex-shrink-0 gap-4">
                     <KanbanColumn v-for="column in columnDefinitions" :key="column.id" :columnId="column.id"
                         :title="column.title" v-model:cards="column.cards" @card-moved="handleCardMoved" />
@@ -26,7 +41,7 @@ import KanbanColumn from '../components/KanbanColumn.vue';
 import { api } from '../services/api';
 import type KanbanCard from '../components/KanbanCard.vue';
 import type { AxiosResponse } from 'axios';
-import { useRoute } from 'vue-router';
+import { useRoute, RouterLink } from 'vue-router';
 
 
 type CardMovedEvent =
