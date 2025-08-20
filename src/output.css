@@ -2743,24 +2743,16 @@ html:has(.modal-state:checked) {
   margin: 0.25rem;
 }
 
+.m-12 {
+  margin: 3rem;
+}
+
 .m-5 {
   margin: 1.25rem;
 }
 
 .m-auto {
   margin: auto;
-}
-
-.m-4 {
-  margin: 1rem;
-}
-
-.m-6 {
-  margin: 1.5rem;
-}
-
-.m-12 {
-  margin: 3rem;
 }
 
 .mb-2 {
@@ -2793,10 +2785,6 @@ html:has(.modal-state:checked) {
 
 .mt-60 {
   margin-top: 15rem;
-}
-
-.mb-4 {
-  margin-bottom: 1rem;
 }
 
 .flex {
@@ -2854,10 +2842,6 @@ html:has(.modal-state:checked) {
 
 .max-w-full {
   max-width: 100%;
-}
-
-.max-w-4xl {
-  max-width: 56rem;
 }
 
 .flex-1 {
@@ -3074,9 +3058,14 @@ html:has(.modal-state:checked) {
   background-color: rgb(202 138 4 / var(--tw-bg-opacity, 1));
 }
 
-.bg-gray-900 {
+.bg-red-500 {
   --tw-bg-opacity: 1;
-  background-color: rgb(17 24 39 / var(--tw-bg-opacity, 1));
+  background-color: rgb(239 68 68 / var(--tw-bg-opacity, 1));
+}
+
+.bg-slate-700 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(51 65 85 / var(--tw-bg-opacity, 1));
 }
 
 .p-2 {
@@ -3154,6 +3143,11 @@ html:has(.modal-state:checked) {
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
+}
+
+.text-base {
+  font-size: 1rem;
+  line-height: 1.5rem;
 }
 
 .font-bold {
