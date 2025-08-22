@@ -1,8 +1,6 @@
 <template>
     <div v-if="isBusy" class="mt-60">
-        <svg class="spinner-ring flex justify-content-center m-auto" viewBox="25 25 50 50" stroke-width="5">
-            <circle cx="50" cy="50" r="20" />
-        </svg>
+        <LoadingSpinner />
     </div>
     <div v-else>
         <div class="m-5">
@@ -43,6 +41,7 @@ import ProjectCard from '../components/project/ProjectCard.vue';
 import NewProjectCreationModal from '../components/project/NewProjectCreationModal.vue';
 
 import type { AxiosResponse } from 'axios';
+import LoadingSpinner from '../components/shared/LoadingSpinner.vue';
 
 interface Project {
     id: number;

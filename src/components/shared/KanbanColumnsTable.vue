@@ -1,21 +1,26 @@
 <template>
     <h2>Colunas Kanban</h2>
-    <table class="table-zebra table">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Posição</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="column in columns" :key="column.id">
-                <td>{{ column.name }}</td>
-                <td>{{ column.position }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div v-if="isBusy" class="flex justify-center">
+        <LoadingSpinner />
+    </div>
+    <div v-else>
+        <table class="table-zebra table w-full">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Posição</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="column in columns" :key="column.id">
+                    <td>{{ column.name }}</td>
+                    <td>{{ column.position }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
-    <label for="modal-1" class="btn bg-slate-700 text-xl w-full">
+    <label for="modal-1" class="btn bg-slate-700 text-xl w-80 mt-2">
         +
     </label>
 
@@ -37,6 +42,7 @@ import { computed, onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { api } from '../../services/api';
 import KanbanColumnCreationModal from '../kanban/KanbanColumnCreationModal.vue';
+import LoadingSpinner from '../shared/LoadingSpinner.vue';
 
 const route = useRoute();
 
@@ -53,10 +59,21 @@ type KanbanColumn = {
 
 const columns = ref<KanbanColumn[]>([]);
 
+const emit = defineEmits(["hasColumns"]);
+
+const isBusy = ref(false);
 
 const getColumns = async () => {
-    const kanbanColumns = await api.get(`/tasks/${projectId.value}/kanban-columns`);
-    columns.value = kanbanColumns.data.data as KanbanColumn[];
+    isBusy.value = true;
+    try {
+        const kanbanColumns = await api.get(`/tasks/${projectId.value}/kanban-columns`);
+        columns.value = kanbanColumns.data.data as KanbanColumn[];
+        emit("hasColumns", { hasColumns: columns.value.length > 0 });
+    } catch (error) {
+        console.error("Error fetching kanban columns:", error);
+    } finally {
+        isBusy.value = false;
+    }
 };
 
 onMounted(async () => {
